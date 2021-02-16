@@ -33,7 +33,7 @@ local _var_fa = ""
 local _var_fb = ""
 
 local _var_file = ""
-
+local _var_launch = true
 --
 -- GUI
 local _x_gaf_groupbox = 16
@@ -73,28 +73,32 @@ function rename_friend()
 end
 --
 function delete_friend()
-	_var_friends_a[8] = "Juke Test 2"
+	changeFriendInfo("ase523452345123wsdft", 3)
 	setOptions()
 end
 --
 function codechange_friend()
-	_var_friends_a[3] = "Juke Test 5"
-	_var_friends_b[3] = "Juke Test 5"
+	changeFriendInfo("Juke Test 5", 5)
+	updateFile()
 	setOptions()
 end
 --
 function main()
+	if _var_launch then
+		loadFile()
+		setOptions()
+		_var_launch = false
+	end
 	--loadFile()
 	--setOptions()
-	if _var_friends_a ~= _var_friends_b then
-		_var_friends_b = _var_friends_a
-		setOptions()
-		print("fixing")
-	end
 	--
 	--AYNF4-BZVL
 	--var xuid = FriendsListAPI.GetXuidFromFriendCode("]]..party[k]..[[");
 	
+end
+
+function changeFriendInfo( txt, id )
+	_var_friends_a[id] = txt
 end
 
 function loadFile()
@@ -112,7 +116,10 @@ function loadFile()
 		end
 		i = i + 1
 	end
-	_var_friends_a[50] = "ba;;s"
+	repeat
+		_var_friends_a[i] = "-"
+		i = i + 1
+	until (i > 51)
 	_var_file = readfile
 end
 
@@ -120,6 +127,20 @@ function saveFile()
 	local f = file.Open( "friends.txt", "w" );
 	f:Write( _var_file )
 	f:Close();
+end
+
+function updateFile()
+	local readfile = ""
+	local i = 1
+	repeat
+		if readfile == "" then
+			readfile = _var_friends_a[i]
+		else
+			readfile = readfile .. "\n" .. _var_friends_a[i]
+		end
+		i = i + 1
+	until (i > 51)
+	_var_file = readfile
 end
 
 function getCode( id )
