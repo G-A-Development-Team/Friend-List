@@ -1,7 +1,7 @@
 -------------------------------------------
 ---------    Friends List v0.1    ---------
 ---------  Created By: Agentsix1  ---------
----------      Date: 2/15/2021     ---------
+---------      Date: 2/15/2021    ---------
 -------------------------------------------
 --------- Tester(s):              ---------
 --------- GameChampCrafted        ---------
@@ -29,13 +29,15 @@ local _var_friends_b = { "-","-","-","-","-","-","-","-","-","-",
 					"-","-","-","-","-","-","-","-","-","-",
 					"-","-","-","-","-","-","-","-","-","-",
 					"-","-","-","-","-","-","-","-","-","-" }
-local f = file.Open( "friends.txt", "r" );
-local read_file = f:Read()
-f:Close();
-local _x_gaf_groupbox = 16
-local _y_gaf_groupbox = 16
+local _var_fa = ""
+local _var_fb = ""
+
+local _var_file = ""
+
 --
 -- GUI
+local _x_gaf_groupbox = 16
+local _y_gaf_groupbox = 16
 local _gui_ref_visuals = gui.Reference("Misc")
 local _gui = gui.Tab(_gui_ref_visuals, "FL_gui", "Friend List")
 local _gaf_groupbox = gui.Groupbox(_gui, "Add Friend", _x_gaf_groupbox, _y_gaf_groupbox)
@@ -50,9 +52,13 @@ local _gaf_button_codechange = gui.Button(_gaf_groupbox, "Change Code", codechan
 --
 --The Dirty Code
 function add_friend()
-
+	loadFile()
+	setOptions()
+end
+--
+function invite_friend()
 	panorama.RunScript([[
-			var xuid = FriendsListAPI.GetXuidFromFriendCode("AYNF4-BZVL");
+			var xuid = FriendsListAPI.GetXuidFromFriendCode("]]..getCode( _gaf_listbox_friends:GetValue() )..[[");
 			var name = FriendsListAPI.GetFriendName(xuid);
 			if(LobbyAPI.IsSessionActive() == false) {
 				LobbyAPI.CreateSession();
@@ -60,45 +66,65 @@ function add_friend()
 			FriendsListAPI.ActionInviteFriend(xuid, '');
 			$.Msg(`Invited \"${name}\" to the lobby.`);
 		]])
-	--table.inser(_var_friends, _gaf_editbox.GetValue())
-	--_gaf_listbox_friends:SetOptions(_var_friends_a)
-end
---
-function invite_friend()
-
 end
 --
 function rename_friend()
-
+	saveFile()
 end
 --
 function delete_friend()
-
+	_var_friends_a[8] = "Juke Test 2"
+	setOptions()
 end
 --
 function codechange_friend()
-
+	_var_friends_a[3] = "Juke Test 5"
+	_var_friends_b[3] = "Juke Test 5"
+	setOptions()
 end
 --
 function main()
-	--local i = 1
-	--for s in read_file:gmatch("[^\r\n]+") do
-	--	_var_friends_a[i] = s
-		--print(s..":"..i)
-	--	i = i + 1
-	--end
+	--loadFile()
+	--setOptions()
+	if _var_friends_a ~= _var_friends_b then
+		_var_friends_b = _var_friends_a
+		setOptions()
+		print("fixing")
+	end
+	--
 	--AYNF4-BZVL
-	_var_friends_a[4] = "hello world"
 	--var xuid = FriendsListAPI.GetXuidFromFriendCode("]]..party[k]..[[");
-	
-	
-	
-	
-	
-	setOptions()
 	
 end
 
+function loadFile()
+	local f = file.Open( "friends.txt", "r" )
+	local read_file = f:Read()
+	f:Close()
+	local i = 1
+	local readfile = ""
+	for s in read_file:gmatch("[^\r\n]+") do
+		_var_friends_a[i] = s
+		if readfile == "" then
+			readfile = s
+		else
+			readfile = readfile .. "\n" .. s
+		end
+		i = i + 1
+	end
+	_var_friends_a[50] = "ba;;s"
+	_var_file = readfile
+end
+
+function saveFile()
+	local f = file.Open( "friends.txt", "w" );
+	f:Write( _var_file )
+	f:Close();
+end
+
+function getCode( id )
+	retun ""
+end
 
 function setOptions()
 	_gaf_listbox_friends:SetOptions(
