@@ -9,26 +9,26 @@
 --
 -- This is a product of the G&A Development Team
 --
-local _var_friends_a = { "-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-" }
-local _var_friends_b = { "-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-",
-					"-","-","-","-","-","-","-","-","-","-" }
+local _var_friends_a = { ",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",","-" }
+local _var_friends_b = { ",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",",",",
+					",",",",",",",",",",",",",",",",",","," }
 local _var_fa = ""
 local _var_fb = ""
 
@@ -44,11 +44,16 @@ local _gaf_groupbox = gui.Groupbox(_gui, "Add Friend", _x_gaf_groupbox, _y_gaf_g
 --
 local _gaf_editbox = gui.Editbox(_gaf_groupbox, "FL_editbox", "Add a friend")
 local _gaf_button_add = gui.Button(_gaf_groupbox, "Add Friend", add_friend)
-local _gaf_listbox_friends = gui.Listbox(_gaf_groupbox, "FL_listbox", 200, "this is entry 1")
-local _gaf_button_invite = gui.Button(_gaf_groupbox, "Invite", invite_friend)
+
 local _gaf_button_rename = gui.Button(_gaf_groupbox, "Rename", rename_friend)
 local _gaf_button_delete = gui.Button(_gaf_groupbox, "Delete", delete_friend)
 local _gaf_button_codechange = gui.Button(_gaf_groupbox, "Change Code", codechange_friend)
+local _gaf_button_invite = gui.Button(_gaf_groupbox, "Invite", invite_friend)
+local _gaf_listbox_friends = gui.Listbox(_gaf_groupbox, "FL_listbox", 200, "this is entry 1")
+_gaf_listbox_friends:SetWidth(432)
+_gaf_listbox_friends:SetPosY(248)
+--local _gaf_button_invite = gui.Button(_gaf_groupbox, "Invite", function() invite_friend() end)
+_gaf_button_invite:SetPosX(448)
 --
 --The Dirty Code
 function add_friend()
@@ -57,8 +62,11 @@ function add_friend()
 end
 --
 function invite_friend()
-	panorama.RunScript([[
-			var xuid = FriendsListAPI.GetXuidFromFriendCode("]]..getCode( _gaf_listbox_friends:GetValue() )..[[");
+		local seletedId = _gaf_listbox_friends:GetValue()+1
+		local code = getCode(seletedId)
+		print(code)
+		panorama.RunScript([[
+			var xuid = FriendsListAPI.GetXuidFromFriendCode("]]..code..[[");
 			var name = FriendsListAPI.GetFriendName(xuid);
 			if(LobbyAPI.IsSessionActive() == false) {
 				LobbyAPI.CreateSession();
@@ -66,6 +74,8 @@ function invite_friend()
 			FriendsListAPI.ActionInviteFriend(xuid, '');
 			$.Msg(`Invited \"${name}\" to the lobby.`);
 		]])
+	
+	--sendFriendInvite( seletedId )
 end
 --
 function rename_friend()
@@ -89,11 +99,7 @@ function main()
 		setOptions()
 		_var_launch = false
 	end
-	--loadFile()
-	--setOptions()
-	--
-	--AYNF4-BZVL
-	--var xuid = FriendsListAPI.GetXuidFromFriendCode("]]..party[k]..[[");
+	local seletedId = _gaf_listbox_friends:GetValue()+1
 	
 end
 
@@ -144,17 +150,40 @@ function updateFile()
 end
 
 function getCode( id )
-	retun ""
+	local code = split(_var_friends_a[id], ",")[2]
+	if code == nil then
+		return "n/a"
+	else
+		return code
+	end
+	
+	
+end
+
+function getName( id )
+	local name = split(_var_friends_a[id], ",")[1]
+	if name == nil then
+		return "-"
+	else
+		return name
+	end
 end
 
 function setOptions()
 	_gaf_listbox_friends:SetOptions(
-		_var_friends_a[1],_var_friends_a[2],_var_friends_a[3],_var_friends_a[4],_var_friends_a[5],_var_friends_a[6],_var_friends_a[7],_var_friends_a[8],_var_friends_a[9],
-		_var_friends_a[10],_var_friends_a[11],_var_friends_a[12],_var_friends_a[13],_var_friends_a[14],_var_friends_a[15],_var_friends_a[16],_var_friends_a[17],_var_friends_a[18],_var_friends_a[19],
-		_var_friends_a[20],_var_friends_a[21],_var_friends_a[22],_var_friends_a[23],_var_friends_a[24],_var_friends_a[25],_var_friends_a[26],_var_friends_a[27],_var_friends_a[28],_var_friends_a[29],
-		_var_friends_a[30],_var_friends_a[31],_var_friends_a[32],_var_friends_a[33],_var_friends_a[34],_var_friends_a[35],_var_friends_a[36],_var_friends_a[37],_var_friends_a[38],_var_friends_a[39],
-		_var_friends_a[40],_var_friends_a[41],_var_friends_a[42],_var_friends_a[43],_var_friends_a[44],_var_friends_a[45],_var_friends_a[46],_var_friends_a[47],_var_friends_a[48],_var_friends_a[49],
-		_var_friends_a[50],_var_friends_a[51])
+		getName(1),getName(2),getName(3),getName(4),getName(5),getName(6),getName(7),getName(8),getName(9),
+		getName(10),getName(11),getName(12),getName(13),getName(14),getName(15),getName(16),getName(17),getName(18),getName(19),
+		getName(20),getName(21),getName(22),getName(23),getName(24),getName(25),getName(26),getName(27),getName(28),getName(29),
+		getName(30),getName(31),getName(32),getName(33),getName(34),getName(35),getName(36),getName(37),getName(38),getName(39),
+		getName(40),getName(41),getName(42),getName(43),getName(44),getName(45),getName(46),getName(47),getName(48),getName(49),
+		getName(50),getName(51))
+end
+
+function split(source, delimiters)
+    local elements = {}
+    local pattern = '([^'..delimiters..']+)'
+    string.gsub(source, pattern, function(value) elements[#elements + 1] =     value;  end);
+    return elements
 end
 
 callbacks.Register("Draw", "Friend_List", main)
