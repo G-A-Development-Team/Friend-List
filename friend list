@@ -19,19 +19,7 @@ local _var_friends_a = { ",",",",",",",",",",",",",",",",",",",",
 					",",",",",",",",",",",",",",",",",",",",
 					",",",",",",",",",",",",",",",",",",",",
 					",",",",",",",",",",",",",",",",",","-" }
-local _var_friends_b = { ",",",",",",",",",",",",",",",",",",",",
-					",",",",",",",",",",",",",",",",",",",",
-					",",",",",",",",",",",",",",",",",",",",
-					",",",",",",",",",",",",",",",",",",",",
-					",",",",",",",",",",",",",",",",",",",",
-					",",",",",",",",",",",",",",",",",",",",
-					",",",",",",",",",",",",",",",",",",",",
-					",",",",",",",",",",",",",",",",",",",",
-					",",",",",",",",",",",",",",",",",",",",
-					",",",",",",",",",",",",",",",",",","," }
-local _var_fa = ""
-local _var_fb = ""
-
+local _var_default ="unused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a\nunused,n/a"
 local _var_file = ""
 local _var_launch = true
 --
@@ -40,30 +28,36 @@ local _x_gaf_groupbox = 16
 local _y_gaf_groupbox = 16
 local _gui_ref_visuals = gui.Reference("Misc")
 local _gui = gui.Tab(_gui_ref_visuals, "FL_gui", "Friend List")
-local _gaf_groupbox = gui.Groupbox(_gui, "Add Friend", _x_gaf_groupbox, _y_gaf_groupbox)
+local _gaf_groupbox = gui.Groupbox(_gui, "Friend List", _x_gaf_groupbox, _y_gaf_groupbox)
 --
-local _gaf_editbox = gui.Editbox(_gaf_groupbox, "FL_editbox", "Add a friend")
-local _gaf_button_add = gui.Button(_gaf_groupbox, "Add Friend", add_friend)
-
-local _gaf_button_rename = gui.Button(_gaf_groupbox, "Rename", rename_friend)
-local _gaf_button_delete = gui.Button(_gaf_groupbox, "Delete", delete_friend)
-local _gaf_button_codechange = gui.Button(_gaf_groupbox, "Change Code", codechange_friend)
 local _gaf_button_invite = gui.Button(_gaf_groupbox, "Invite", invite_friend)
-local _gaf_listbox_friends = gui.Listbox(_gaf_groupbox, "FL_listbox", 200, "this is entry 1")
-_gaf_listbox_friends:SetWidth(432)
-_gaf_listbox_friends:SetPosY(248)
---local _gaf_button_invite = gui.Button(_gaf_groupbox, "Invite", function() invite_friend() end)
 _gaf_button_invite:SetPosX(448)
+local _gaf_button_edit = gui.Button(_gaf_groupbox, "Edit", edit_friend)
+_gaf_button_edit:SetPosX(448)
+local _gaf_editbox_name = gui.Editbox(_gaf_groupbox, "FL_editbox_name", "Set Friend Name")
+_gaf_editbox_name:SetPosX(448)
+_gaf_editbox_name:SetWidth(128)
+_gaf_editbox_name:SetInvisible(true)
+local _gaf_editbox_code = gui.Editbox(_gaf_groupbox, "FL_editbox_code", "Set Friend Code")
+_gaf_editbox_code:SetPosX(448)
+_gaf_editbox_code:SetWidth(128)
+_gaf_editbox_code:SetInvisible(true)
+local _gaf_button_save = gui.Button(_gaf_groupbox, "Save", save_friend)
+_gaf_button_save:SetPosX(448)
+_gaf_button_save:SetInvisible(true)
+local _gaf_button_delete = gui.Button(_gaf_groupbox, "Delete", delete_friend)
+_gaf_button_delete:SetPosX(448)
+
+local _gaf_listbox_friends = gui.Listbox(_gaf_groupbox, "FL_listbox", 400, " ")
+_gaf_listbox_friends:SetWidth(432)
+_gaf_listbox_friends:SetPosY(0)
+
 --
 --The Dirty Code
-function add_friend()
-	loadFile()
-	setOptions()
-end
 --
 function invite_friend()
-		local seletedId = _gaf_listbox_friends:GetValue()+1
-		local code = getCode(seletedId)
+		local selectedId = _gaf_listbox_friends:GetValue()+1
+		local code = getCode(selectedId)
 		print(code)
 		panorama.RunScript([[
 			var xuid = FriendsListAPI.GetXuidFromFriendCode("]]..code..[[");
@@ -74,22 +68,33 @@ function invite_friend()
 			FriendsListAPI.ActionInviteFriend(xuid, '');
 			$.Msg(`Invited \"${name}\" to the lobby.`);
 		]])
-	
-	--sendFriendInvite( seletedId )
 end
 --
-function rename_friend()
-	saveFile()
+function save_friend()
+	local selectedId = _gaf_listbox_friends:GetValue()+1
+	setName(selectedId, _gaf_editbox_name:GetValue())
+	setCode(selectedId, _gaf_editbox_code:GetValue())
+	setFile()
+	setOptions()
+	_gaf_editbox_name:SetInvisible(true)
+	_gaf_editbox_code:SetInvisible(true)
+	_gaf_button_save:SetInvisible(true)
+end
+--
+function edit_friend()
+	_gaf_editbox_name:SetInvisible(false)
+	_gaf_editbox_code:SetInvisible(false)
+	_gaf_button_save:SetInvisible(false)
+	local selectedId = _gaf_listbox_friends:GetValue()+1
+	_gaf_editbox_name:SetValue(getName(selectedId))
+	_gaf_editbox_code:SetValue(getCode(selectedId))
 end
 --
 function delete_friend()
-	changeFriendInfo("ase523452345123wsdft", 3)
-	setOptions()
-end
---
-function codechange_friend()
-	changeFriendInfo("Juke Test 5", 5)
-	updateFile()
+	local selectedId = _gaf_listbox_friends:GetValue()+1
+	setName(selectedId, "unused")
+	setCode(selectedId, "n/a")
+	setFile()
 	setOptions()
 end
 --
@@ -99,7 +104,6 @@ function main()
 		setOptions()
 		_var_launch = false
 	end
-	local seletedId = _gaf_listbox_friends:GetValue()+1
 	
 end
 
@@ -108,6 +112,11 @@ function changeFriendInfo( txt, id )
 end
 
 function loadFile()
+	local f = file.Open( "friends.txt", "a" )
+	if f:Size() == 0 then
+	f:Write(_var_default)
+	end
+	f:Close()
 	local f = file.Open( "friends.txt", "r" )
 	local read_file = f:Read()
 	f:Close()
@@ -163,10 +172,37 @@ end
 function getName( id )
 	local name = split(_var_friends_a[id], ",")[1]
 	if name == nil then
-		return "-"
+		return "unused"
 	else
 		return name
 	end
+end
+
+function setName( id, name )
+	local code = getCode(id)
+	_var_friends_a[id] = name .. "," .. code
+end
+
+function setCode( id, code )
+	local name = getName(id)
+	_var_friends_a[id] = name .. "," .. code
+end
+
+function setFile()
+	local i = 1
+	local file = ""
+	repeat
+		if file == "" then
+			file = getName(i) .. "," .. getCode(i)
+		else
+			file = file .. "\n" .. getName(i) .. "," .. getCode(i)
+		end
+		 
+		i = i + 1
+	until (i > 51)
+	_var_file = file
+	saveFile()
+	loadFile()
 end
 
 function setOptions()
