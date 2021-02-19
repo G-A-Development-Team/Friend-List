@@ -56,17 +56,14 @@ _gaf_listbox_friends:SetPosY(0)
 --The Dirty Code
 --
 function invite_friend()
-		local selectedId = _gaf_listbox_friends:GetValue()+1
-		local code = getCode(selectedId)
-		print(code)
+		
+		send()
+end
+function send()
+	local selectedId = _gaf_listbox_friends:GetValue()+1
+	local code = getCode(selectedId)
 		panorama.RunScript([[
-			var xuid = FriendsListAPI.GetXuidFromFriendCode("]]..code..[[");
-			var name = FriendsListAPI.GetFriendName(xuid);
-			if(LobbyAPI.IsSessionActive() == false) {
-				LobbyAPI.CreateSession();
-			}
-			FriendsListAPI.ActionInviteFriend(xuid, '');
-			$.Msg(`Invited \"${name}\" to the lobby.`);
+			invites.push("]]..code..[[");
 		]])
 end
 --
@@ -103,8 +100,27 @@ function main()
 		loadFile()
 		setOptions()
 		_var_launch = false
+		panorama.RunScript([[ var invites = []; var temp_invites = [];]])	
 	end
+	panorama.RunScript([[
+	if (invites.length > 0) {
+		for (i = 0; i < invites.length; i++) {
+			var xuid = FriendsListAPI.GetXuidFromFriendCode(invites[i]);
+			if (FriendsListAPI.IsFriendInvited(xuid)) {
+				FriendsListAPI.ActionInviteFriend(xuid, '');
+			} else {
+				temp_invites.push(invites[i]);
+				FriendsListAPI.ActionInviteFriend(xuid, '');
+			}
+			
+		}
+		invites = temp_invites;
+		temp_invites = [];
+	}
 	
+	]])
+	local selectedId = _gaf_listbox_friends:GetValue()+1
+	local code = getCode(selectedId)
 end
 
 function changeFriendInfo( txt, id )
