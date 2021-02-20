@@ -102,25 +102,28 @@ function main()
 		_var_launch = false
 		panorama.RunScript([[ var invites = []; var temp_invites = [];]])	
 	end
-	panorama.RunScript([[
-	if (invites.length > 0) {
-		for (i = 0; i < invites.length; i++) {
-			var xuid = FriendsListAPI.GetXuidFromFriendCode(invites[i]);
-			if (FriendsListAPI.IsFriendInvited(xuid)) {
-				FriendsListAPI.ActionInviteFriend(xuid, '');
-			} else {
-				temp_invites.push(invites[i]);
-				FriendsListAPI.ActionInviteFriend(xuid, '');
+	if entities.GetLocalPlayer == nil then
+		if code == "n/a" then
+			return
+		end
+		panorama.RunScript([[
+		if (invites.length > 0) {
+			for (i = 0; i < invites.length; i++) {
+				var xuid = FriendsListAPI.GetXuidFromFriendCode(invites[i]);
+				if (FriendsListAPI.IsFriendInvited(xuid)) {
+					FriendsListAPI.ActionInviteFriend(xuid, '');
+				} else {
+					temp_invites.push(invites[i]);
+					FriendsListAPI.ActionInviteFriend(xuid, '');
+				}
+				
 			}
-			
+			invites = temp_invites;
+			temp_invites = [];
 		}
-		invites = temp_invites;
-		temp_invites = [];
-	}
-	
-	]])
-	local selectedId = _gaf_listbox_friends:GetValue()+1
-	local code = getCode(selectedId)
+		
+		]])
+	end
 end
 
 function changeFriendInfo( txt, id )
