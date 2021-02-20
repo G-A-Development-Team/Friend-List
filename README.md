@@ -1,4 +1,4 @@
-# Bomb Info Advanced
+# Friends List v0.1
 
 ![Image not found](https://github.com/G-A-Development-Team/Friend-List/blob/main/Instructions/screnshot.PNG?raw=true)
 
