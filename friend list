@@ -109,15 +109,14 @@ function main()
 		_var_launch = false
 		panorama.RunScript([[ var invites = []; var temp_invites = [];]])	
 	end
-	--if entities.GetLocalPlayer == nil then
-		if code == "n/a" then
-			return
-		end
-		local player = entities.GetLocalPlayer()
-		if player ~= nil then
-			return
-		end
-		panorama.RunScript([[
+	if code == "n/a" then
+		return
+	end
+	local player = entities.GetLocalPlayer()
+	if player ~= nil then
+		return
+	end
+	panorama.RunScript([[
 		if (invites.length > 0) {
 			for (i = 0; i < invites.length; i++) {
 				var xuid = FriendsListAPI.GetXuidFromFriendCode(invites[i]);
@@ -134,9 +133,8 @@ function main()
 			invites = temp_invites;
 			temp_invites = [];
 		}
-		
-		]])
-	--end
+	
+	]])
 end
 
 function changeFriendInfo( txt, id )
