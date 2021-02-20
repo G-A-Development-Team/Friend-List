@@ -60,11 +60,18 @@ function invite_friend()
 		send()
 end
 function send()
+	local player = entities.GetLocalPlayer()
+	if player ~= nil then
+		return
+	end
 	local selectedId = _gaf_listbox_friends:GetValue()+1
 	local code = getCode(selectedId)
-		panorama.RunScript([[
-			invites.push("]]..code..[[");
-		]])
+	local name = getName(selectedId)
+	panorama.RunScript([[
+		invites.push("]]..code..[[");
+		$.Msg(`Invite for ]]..name..": "..code..[[ has been added to list for invites`);
+	]])
+	
 end
 --
 function save_friend()
@@ -102,8 +109,12 @@ function main()
 		_var_launch = false
 		panorama.RunScript([[ var invites = []; var temp_invites = [];]])	
 	end
-	if entities.GetLocalPlayer == nil then
+	--if entities.GetLocalPlayer == nil then
 		if code == "n/a" then
+			return
+		end
+		local player = entities.GetLocalPlayer()
+		if player ~= nil then
 			return
 		end
 		panorama.RunScript([[
@@ -112,9 +123,11 @@ function main()
 				var xuid = FriendsListAPI.GetXuidFromFriendCode(invites[i]);
 				if (FriendsListAPI.IsFriendInvited(xuid)) {
 					FriendsListAPI.ActionInviteFriend(xuid, '');
+					$.Msg(`Invited user with invite code: ` + invites[i]);
 				} else {
 					temp_invites.push(invites[i]);
 					FriendsListAPI.ActionInviteFriend(xuid, '');
+					$.Msg(`Invited user with invite code: ` + invites[i]);
 				}
 				
 			}
@@ -123,7 +136,7 @@ function main()
 		}
 		
 		]])
-	end
+	--end
 end
 
 function changeFriendInfo( txt, id )
